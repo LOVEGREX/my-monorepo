@@ -51,12 +51,22 @@ const resolveModule = (resolveFn, filePath) => {
 };
 
 // config after eject: we're in ./config/
+const appPublicPath = (() => {
+  // Check if this is being run from an app package
+  const localPublic = resolveApp('public');
+  if (fs.existsSync(localPublic)) {
+    return localPublic;
+  }
+  // Fallback to shared public directory for monorepo setup
+  return resolveApp('../shared/public');
+})();
+
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
   appBuild: resolveApp(buildPath),
-  appPublic: resolveApp('public'),
-  appHtml: resolveApp('public/index.html'),
+  appPublic: appPublicPath,
+  appHtml: path.join(appPublicPath, 'index.html'),
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
