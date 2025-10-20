@@ -1,5 +1,5 @@
 {
-  "name": "@my-monorepo/app1",
+  "name": "@my-monorepo/app2",
   "private": true,
   "scripts": {
     "start": "node ../shared/scripts/start.js",
