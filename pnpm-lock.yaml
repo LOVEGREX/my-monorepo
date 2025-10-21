@@ -87,31 +87,6 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
 
-  packages/app4:
-    dependencies:
-      '@my-monorepo/shared':
-        specifier: workspace:*
-        version: link:../shared
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-      web-vitals:
-        specifier: ^2.1.4
-        version: 2.1.4
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.14
-        version: 18.3.26
-      '@types/react-dom':
-        specifier: ^18.2.6
-        version: 18.3.7(@types/react@18.3.26)
-      typescript:
-        specifier: ^4.9.5
-        version: 4.9.5
-
   packages/shared:
     dependencies:
       '@babel/core':
