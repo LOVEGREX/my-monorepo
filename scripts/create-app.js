@@ -6,22 +6,21 @@ const { execSync } = require('child_process');
 
 /**
  * 创建新的app并设置共享配置
- * 使用方法: node scripts/create-app.js <app-name>
- * 例如: node scripts/create-app.js app3
+ * 使用方法: pnpm create-app <app-name> 或 node scripts/create-app.js <app-name>
+ * 例如: pnpm create-app app3
  */
 
 const appName = process.argv[2];
 
 if (!appName) {
   console.error('请提供app名称');
-  console.log('使用方法: node scripts/create-app.js <app-name>');
+  console.log('使用方法: pnpm create-app <app-name>');
   process.exit(1);
 }
 
 const projectRoot = path.resolve(__dirname, '..');
 const packagesDir = path.join(projectRoot, 'packages');
 const newAppDir = path.join(packagesDir, appName);
-const sharedConfigDir = path.join(packagesDir, 'shared', 'config');
 
 // 检查app是否已存在
 if (fs.existsSync(newAppDir)) {
@@ -36,38 +35,35 @@ try {
   fs.mkdirSync(newAppDir, { recursive: true });
   fs.mkdirSync(path.join(newAppDir, 'src'), { recursive: true });
 
-  // 2. 创建package.json
+  // 2. 创建package.json (与app1、app2保持一致)
   const packageJson = {
     name: `@my-monorepo/${appName}`,
-    version: "1.0.0",
     private: true,
+    scripts: {
+      "start": "node ../shared/scripts/start.js",
+      "build": "node ../shared/scripts/build.js",
+      "build:shared": "pnpm --filter @my-monorepo/shared build",
+      "test": "node ../shared/scripts/test.js",
+      "watch:shared": "pnpm --filter @my-monorepo/shared watch"
+    },
     dependencies: {
       "@my-monorepo/shared": "workspace:*",
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
-      "react-scripts": "5.0.1",
-      "typescript": "^4.9.5",
       "web-vitals": "^2.1.4"
     },
-    scripts: {
-      "start": "node ../shared/scripts/start.js",
-      "build": "node ../shared/scripts/build.js",
-      "test": "node ../shared/scripts/test.js",
-      "eject": "react-scripts eject"
+    devDependencies: {
+      "@types/react": "^18.2.14",
+      "@types/react-dom": "^18.2.6",
+      "typescript": "^4.9.5"
     },
-    "eslintConfig": {
-      "extends": [
-        "react-app",
-        "react-app/jest"
-      ]
-    },
-    "browserslist": {
-      "production": [
+    browserslist: {
+      production: [
         ">0.2%",
         "not dead",
         "not op_mini all"
       ],
-      "development": [
+      development: [
         "last 1 chrome version",
         "last 1 firefox version",
         "last 1 safari version"
@@ -82,28 +78,28 @@ try {
 
   // 3. 创建tsconfig.json
   const tsConfig = {
-    "compilerOptions": {
-      "target": "es5",
-      "lib": [
+    compilerOptions: {
+      target: "es5",
+      lib: [
         "dom",
         "dom.iterable",
         "es6"
       ],
-      "allowJs": true,
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "strict": true,
-      "forceConsistentCasingInFileNames": true,
-      "noFallthroughCasesInSwitch": true,
-      "module": "esnext",
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "noEmit": true,
-      "jsx": "react-jsx"
+      allowJs: true,
+      skipLibCheck: true,
+      esModuleInterop: true,
+      allowSyntheticDefaultImports: true,
+      strict: true,
+      forceConsistentCasingInFileNames: true,
+      noFallthroughCasesInSwitch: true,
+      module: "esnext",
+      moduleResolution: "node",
+      resolveJsonModule: true,
+      isolatedModules: true,
+      noEmit: true,
+      jsx: "react-jsx"
     },
-    "include": [
+    include: [
       "src"
     ]
   };
@@ -113,49 +109,7 @@ try {
     JSON.stringify(tsConfig, null, 2)
   );
 
-  // 4. 创建符号链接指向shared的config
-  const configLinkPath = path.join(newAppDir, 'config');
-  const sharedConfigPath = path.join(projectRoot, 'packages', 'shared', 'config');
-  
-  // 在Windows上创建符号链接
-  if (process.platform === 'win32') {
-    execSync(`New-Item -ItemType SymbolicLink -Path "${configLinkPath}" -Target "${sharedConfigPath}"`, {
-      shell: 'powershell',
-      cwd: projectRoot
-    });
-  } else {
-    // 在Unix系统上创建符号链接
-    fs.symlinkSync(sharedConfigPath, configLinkPath, 'dir');
-  }
-
-  // 5. 创建符号链接指向shared的scripts
-  const scriptsLinkPath = path.join(newAppDir, 'scripts');
-  const sharedScriptsPath = path.join(projectRoot, 'packages', 'shared', 'scripts');
-  
-  if (process.platform === 'win32') {
-    execSync(`New-Item -ItemType SymbolicLink -Path "${scriptsLinkPath}" -Target "${sharedScriptsPath}"`, {
-      shell: 'powershell',
-      cwd: projectRoot
-    });
-  } else {
-    fs.symlinkSync(sharedScriptsPath, scriptsLinkPath, 'dir');
-  }
-
-  // 6. 创建符号链接指向shared的public
-  const publicLinkPath = path.join(newAppDir, 'public');
-  const sharedPublicPath = path.join(projectRoot, 'packages', 'shared', 'public');
-  
-  if (process.platform === 'win32') {
-    execSync(`New-Item -ItemType SymbolicLink -Path "${publicLinkPath}" -Target "${sharedPublicPath}"`, {
-      shell: 'powershell',
-      cwd: projectRoot
-    });
-  } else {
-    fs.symlinkSync(sharedPublicPath, publicLinkPath, 'dir');
-  }
-
-  // 7. 创建基本的React文件
-  // 注意：不再创建index.html，因为我们使用shared中的public目录
+  // 4. 创建基本的React文件 (与app1、app2保持一致)
 
   const indexTsx = `import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -208,6 +162,7 @@ export default App;`;
 
   fs.writeFileSync(path.join(newAppDir, 'src', 'App.tsx'), appTsx);
 
+  // App.css - 完整样式，占满整个屏幕
   const appCss = `.App {
   text-align: center;
 }
@@ -225,7 +180,12 @@ export default App;`;
 
 .App-header {
   background-color: #282c34;
-  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
   color: white;
 }
 
@@ -278,13 +238,18 @@ export default reportWebVitals;`;
 
   fs.writeFileSync(path.join(newAppDir, 'src', 'reportWebVitals.ts'), reportWebVitals);
 
+  // 6. 复制logo.svg
+  const app1LogoPath = path.join(packagesDir, 'app1', 'src', 'logo.svg');
+  const newAppLogoPath = path.join(newAppDir, 'src', 'logo.svg');
+  if (fs.existsSync(app1LogoPath)) {
+    fs.copyFileSync(app1LogoPath, newAppLogoPath);
+  }
+
   console.log(`✅ App "${appName}" 创建成功！`);
   console.log(`📁 位置: ${newAppDir}`);
-  console.log(`🔗 已创建符号链接指向shared的config、scripts和public`);
   console.log(`\n🚀 使用方法:`);
-  console.log(`  cd packages/${appName}`);
   console.log(`  pnpm install`);
-  console.log(`  pnpm start`);
+  console.log(`  pnpm start:${appName}`);
 
 } catch (error) {
   console.error('创建app时出错:', error.message);
