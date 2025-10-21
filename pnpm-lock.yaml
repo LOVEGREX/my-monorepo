@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      shelljs:
+        specifier: ^0.10.0
+        version: 0.10.0
 
   packages/app1:
     dependencies:
@@ -34,6 +38,56 @@ importers:
         version: 4.9.5
 
   packages/app2:
+    dependencies:
+      '@my-monorepo/shared':
+        specifier: workspace:*
+        version: link:../shared
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+      web-vitals:
+        specifier: ^2.1.4
+        version: 2.1.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.14
+        version: 18.3.26
+      '@types/react-dom':
+        specifier: ^18.2.6
+        version: 18.3.7(@types/react@18.3.26)
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  packages/app3:
+    dependencies:
+      '@my-monorepo/shared':
+        specifier: workspace:*
+        version: link:../shared
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+      web-vitals:
+        specifier: ^2.1.4
+        version: 2.1.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.14
+        version: 18.3.26
+      '@types/react-dom':
+        specifier: ^18.2.6
+        version: 18.3.7(@types/react@18.3.26)
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  packages/app4:
     dependencies:
       '@my-monorepo/shared':
         specifier: workspace:*
@@ -4908,6 +4962,10 @@ packages:
   shell-quote@1.8.3:
     resolution: {integrity: sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==}
     engines: {node: '>= 0.4'}
+
+  shelljs@0.10.0:
+    resolution: {integrity: sha512-Jex+xw5Mg2qMZL3qnzXIfaxEtBaC4n7xifqaqtrZDdlheR70OGkydrPJWT0V1cA1k3nanC86x9FwAmQl6w3Klw==}
+    engines: {node: '>=18'}
 
   side-channel-list@1.0.0:
     resolution: {integrity: sha512-FCLHtRD/gnpCiCHEiJLOwdmFP+wzCmDEkc9y7NsYxeF4u7Btsn1ZuwgwJGxImImHicJArLP4R0yX4c2KCrMrTA==}
@@ -11194,6 +11252,11 @@ snapshots:
   shebang-regex@3.0.0: {}
 
   shell-quote@1.8.3: {}
+
+  shelljs@0.10.0:
+    dependencies:
+      execa: 5.1.1
+      fast-glob: 3.3.3
 
   side-channel-list@1.0.0:
     dependencies:

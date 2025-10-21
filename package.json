@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pnpm --filter @my-monorepo/app1 start",
-    "start:app1": "pnpm --filter @my-monorepo/app1 start",
-    "start:app2": "pnpm --filter @my-monorepo/app2 start",
+    "start": "node scripts/start-app.js",
     "build": "pnpm --filter @my-monorepo/shared build && pnpm --filter @my-monorepo/app1 build && pnpm --filter @my-monorepo/app2 build",
     "build:shared": "pnpm --filter @my-monorepo/shared build",
     "build:app1": "pnpm --filter @my-monorepo/app1 build",
@@ -18,5 +16,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "shelljs": "^0.10.0"
+  }
 }
