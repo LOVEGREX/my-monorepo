@@ -315,7 +315,7 @@ declare module '*.module.sass' {
   fs.writeFileSync(path.join(newAppDir, 'src', 'react-app-env.d.ts'), reactAppEnv);
 
   // 6. 复制logo.svg
-  const app1LogoPath = path.join(packagesDir, 'app1', 'src', 'logo.svg');
+  const app1LogoPath = path.join(projectRoot, 'packages', 'images', 'logo.svg');
   const newAppLogoPath = path.join(newAppDir, 'src', 'logo.svg');
   if (fs.existsSync(app1LogoPath)) {
     fs.copyFileSync(app1LogoPath, newAppLogoPath);

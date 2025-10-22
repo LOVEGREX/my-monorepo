@@ -12,11 +12,11 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
 
-  packages/app1:
+  apps/app1:
     dependencies:
       '@my-monorepo/shared':
         specifier: workspace:*
-        version: link:../shared
+        version: link:../../packages/shared
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -37,11 +37,11 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
 
-  packages/app2:
+  apps/app2:
     dependencies:
       '@my-monorepo/shared':
         specifier: workspace:*
-        version: link:../shared
+        version: link:../../packages/shared
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -62,11 +62,11 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
 
-  packages/app3:
+  apps/app3:
     dependencies:
       '@my-monorepo/shared':
         specifier: workspace:*
-        version: link:../shared
+        version: link:../../packages/shared
       react:
         specifier: ^18.2.0
         version: 18.3.1
