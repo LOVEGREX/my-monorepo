@@ -1,7 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { hello, deepHello } from '@my-monorepo/my-lib';
 
 function App() {
   return (
@@ -11,8 +10,6 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <p>{hello()}</p>
-        <p>{deepHello()}</p>
         <a
           className="App-link"
           href="https://reactjs.org"

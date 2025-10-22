@@ -48,6 +48,7 @@ try {
     },
     dependencies: {
       "@my-monorepo/shared": "workspace:*",
+      "@my-monorepo/my-lib": "workspace:*",
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
       "web-vitals": "^2.1.4"
