@@ -58,7 +58,7 @@ const appPublicPath = (() => {
     return localPublic;
   }
   // Fallback to shared public directory for monorepo setup
-  return resolveApp('../shared/public');
+  return resolveApp('../../packages/shared/public');
 })();
 
 module.exports = {
