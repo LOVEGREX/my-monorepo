@@ -19,7 +19,7 @@ if (!appName) {
 }
 
 const projectRoot = path.resolve(__dirname, '..');
-const packagesDir = path.join(projectRoot, 'packages');
+const packagesDir = path.join(projectRoot, 'apps');
 const newAppDir = path.join(packagesDir, appName);
 
 // 检查app是否已存在
@@ -40,10 +40,10 @@ try {
     name: `@my-monorepo/${appName}`,
     private: true,
     scripts: {
-      "start": "node ../shared/scripts/start.js",
-      "build": "node ../shared/scripts/build.js",
+      "start": "node ../../packages/shared/scripts/start.js",
+      "build": "node ../../packages/shared/scripts/build.js",
       "build:shared": "pnpm --filter @my-monorepo/shared build",
-      "test": "node ../shared/scripts/test.js",
+      "test": "node ../../packages/shared/scripts/test.js",
       "watch:shared": "pnpm --filter @my-monorepo/shared watch"
     },
     dependencies: {

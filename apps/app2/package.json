@@ -2,10 +2,10 @@
   "name": "@my-monorepo/app2",
   "private": true,
   "scripts": {
-    "start": "node ../shared/scripts/start.js",
-    "build": "node ../shared/scripts/build.js",
+    "start": "node ../../packages/shared/scripts/start.js",
+    "build": "node ../../packages/shared/scripts/build.js",
     "build:shared": "pnpm --filter @my-monorepo/shared build",
-    "test": "node ../shared/scripts/test.js",
+    "test": "node ../../packages/shared/scripts/test.js",
     "watch:shared": "pnpm --filter @my-monorepo/shared watch"
   },
   "dependencies": {

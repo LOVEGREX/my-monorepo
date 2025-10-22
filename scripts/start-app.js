@@ -16,7 +16,7 @@ const path = require('path');
  */
 
 const projectRoot = path.resolve(__dirname, '..');
-const packagesDir = path.join(projectRoot, 'packages');
+const packagesDir = path.join(projectRoot, 'apps');
 
 // 解析命令行参数
 const args = process.argv.slice(2);
