@@ -1,3 +1,4 @@
 import { deepHello } from "@/path/to/deep";
+import { hello } from "@/hello";
 
-export { deepHello };
+export { hello ,deepHello };

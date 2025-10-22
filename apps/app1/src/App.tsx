@@ -1,8 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { hello } from '@my-monorepo/my-lib/dist/hello';
-import { deepHello } from '@my-monorepo/my-lib';
+import { hello , deepHello } from '@my-monorepo/my-lib';
 function App() {
   return (
     <div className="App">
@@ -24,6 +23,6 @@ function App() {
       </header>
     </div>
   );
-}
+} 
 
 export default App;
