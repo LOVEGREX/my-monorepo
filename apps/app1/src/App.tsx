@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { hello , deepHello } from '@my-monorepo/my-lib';
+import { hello , deepHello } from '@grxxxx/my-lib';
 function App() {
   return (
     <div className="App">

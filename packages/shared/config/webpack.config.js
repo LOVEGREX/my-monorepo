@@ -318,6 +318,9 @@ module.exports = function (webpackEnv) {
           'react-dom$': 'react-dom/profiling',
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
+        // Support monorepo workspace packages with path aliases
+        // When my-lib uses @/ imports, resolve them to my-lib/src
+        '@': path.resolve(paths.appPath, '../../packages/my-lib/src'),
         ...(modules.webpackAliases || {}),
       },
       plugins: [
@@ -333,6 +336,8 @@ module.exports = function (webpackEnv) {
           babelRuntimeEntry,
           babelRuntimeEntryHelpers,
           babelRuntimeRegenerator,
+          // Allow monorepo workspace packages
+          path.resolve(paths.appPath, '../../packages/my-lib/src'),
         ]),
       ],
     },
@@ -405,7 +410,11 @@ module.exports = function (webpackEnv) {
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
-              include: paths.appSrc,
+              include: [
+                paths.appSrc,
+                // Include monorepo workspace packages for transpilation
+                path.resolve(paths.appPath, '../../packages/my-lib/src'),
+              ],
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(

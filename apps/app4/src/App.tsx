@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { hello, deepHello } from '@grxxxx/my-lib';
 
 function App() {
   return (
@@ -9,6 +10,12 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
+        </p>
+        <p>
+          <strong>From my-lib:</strong> {hello()}
+        </p>
+        <p>
+          <strong>Deep Hello:</strong> {deepHello()}
         </p>
         <a
           className="App-link"

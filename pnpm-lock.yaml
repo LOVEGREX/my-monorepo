@@ -14,7 +14,7 @@ importers:
 
   apps/app1:
     dependencies:
-      '@my-monorepo/my-lib':
+      '@grxxxx/my-lib':
         specifier: workspace:*
         version: link:../../packages/my-lib
       '@my-monorepo/shared':
@@ -42,7 +42,7 @@ importers:
 
   apps/app2:
     dependencies:
-      '@my-monorepo/my-lib':
+      '@grxxxx/my-lib':
         specifier: workspace:*
         version: link:../../packages/my-lib
       '@my-monorepo/shared':
@@ -70,7 +70,7 @@ importers:
 
   apps/app3:
     dependencies:
-      '@my-monorepo/my-lib':
+      '@grxxxx/my-lib':
         specifier: workspace:*
         version: link:../../packages/my-lib
       '@my-monorepo/shared':
@@ -98,7 +98,7 @@ importers:
 
   apps/app4:
     dependencies:
-      '@my-monorepo/my-lib':
+      '@grxxxx/my-lib':
         specifier: workspace:*
         version: link:../../packages/my-lib
       '@my-monorepo/shared':
