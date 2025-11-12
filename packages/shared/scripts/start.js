@@ -70,7 +70,6 @@ if (process.env.HOST) {
 }
 
 // 集群模式逻辑
-// 使用 cluster.isPrimary (Node.js 16+) 替代已废弃的 cluster.isMaster
 if (IF_CLUSTER && cluster.isPrimary) {
   console.log(chalk.cyan(`\n${'='.repeat(60)}`));
   console.log(chalk.cyan(`Master process ${process.pid} is running`));
