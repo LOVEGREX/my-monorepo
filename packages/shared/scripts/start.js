@@ -94,6 +94,41 @@ if (IF_CLUSTER && cluster.isPrimary) {
   cluster.on('online', (worker) => {
     console.log(chalk.green(`Worker ${worker.process.pid} is online`));
   });
+
+  // ========== Worker 通信功能 ==========
+  // 监听来自 Workers 的消息
+  cluster.on('message', (worker, message) => {
+    if (message && message.type === 'broadcast') {
+      console.log(chalk.cyan(`\n${'='.repeat(60)}`));
+      console.log(chalk.cyan(`[Master] 收到来自 Worker ${worker.process.pid} 的消息:`));
+      console.log(chalk.cyan(`  内容: ${message.data}`));
+      console.log(chalk.cyan(`[Master] 正在广播给其他 Workers...`));
+      
+      let broadcastCount = 0;
+      // 广播给除了发送者之外的所有 Workers
+      for (const id in cluster.workers) {
+        const targetWorker = cluster.workers[id];
+        // 排除发送者自己
+        if (targetWorker.process.pid !== worker.process.pid) {
+          targetWorker.send({
+            type: 'broadcast-message',
+            from: worker.process.pid,
+            data: message.data,
+            timestamp: Date.now()
+          });
+          broadcastCount++;
+          console.log(chalk.green(`  ✓ 已发送给 Worker ${targetWorker.process.pid}`));
+        }
+      }
+      console.log(chalk.cyan(`[Master] 共广播给 ${broadcastCount} 个 Workers`));
+      console.log(chalk.cyan(`${'='.repeat(60)}\n`));
+    } else {
+      // 调试：显示所有收到的消息类型
+      if (message) {
+        console.log(chalk.gray(`[Master] 收到来自 Worker ${worker.process.pid} 的消息类型: ${message.type || 'unknown'}`));
+      }
+    }
+  });
 } else {
   // We require that you explicitly set browsers and do not fall back to
   // browserslist defaults.
@@ -167,6 +202,43 @@ if (IF_CLUSTER && cluster.isPrimary) {
         
         if (IF_CLUSTER) {
           console.log(chalk.green(`Worker ${process.pid} is ready and serving on ${urls.localUrlForBrowser}`));
+          
+          // ========== Worker 通信功能 ==========
+          // 监听来自 Master 的广播消息
+          process.on('message', (message) => {
+            if (message && message.type === 'broadcast-message') {
+              console.log(chalk.yellow(`\n[Worker ${process.pid}] 收到广播消息:`));
+              console.log(chalk.yellow(`  来自: Worker ${message.from}`));
+              console.log(chalk.yellow(`  内容: ${message.data}`));
+              console.log(chalk.yellow(`  时间: ${new Date(message.timestamp).toLocaleTimeString()}\n`));
+            }
+          });
+
+          // 默认启用广播功能：延迟 3 秒后开始发送，确保所有 Workers 都已启动
+          setTimeout(() => {
+            let messageCount = 0;
+            console.log(chalk.cyan(`\n[Worker ${process.pid}] 通信功能已启用，将每 1 秒发送一条消息\n`));
+            
+            // 立即发送第一条消息
+            messageCount++;
+            const firstMessage = `这是 Worker ${process.pid} 的第 ${messageCount} 条消息（启动测试）`;
+            console.log(chalk.cyan(`[Worker ${process.pid}] 发送消息给 Master: ${firstMessage}`));
+            process.send({
+              type: 'broadcast',
+              data: firstMessage
+            });
+            
+            // 之后每 1 秒发送一条
+            setInterval(() => {
+              messageCount++;
+              const message = `这是 Worker ${process.pid} 的第 ${messageCount} 条消息`;
+              console.log(chalk.cyan(`[Worker ${process.pid}] 发送消息给 Master: ${message}`));
+              process.send({
+                type: 'broadcast',
+                data: message
+              });
+            }, 1000);
+          }, 3000);
         } else {
           openBrowser(urls.localUrlForBrowser);
         }
@@ -193,4 +265,10 @@ if (IF_CLUSTER && cluster.isPrimary) {
       }
       process.exit(1);
     });
+}
+
+function broadcastToAllWorkers(message) {
+  for (const id in cluster.workers) {
+    cluster.workers[id].send(message);
+  }
 }
