@@ -214,7 +214,7 @@ if (IF_CLUSTER && cluster.isPrimary) {
           }
         });
         
-        // 路由 1: 发送消息给其他 Workers
+        //发送消息给其他 Workers
         devServer.app.post('/api/worker/broadcast', (req, res) => {
           console.log(chalk.cyan(`[Worker ${process.pid}] 收到 POST /api/worker/broadcast 请求`));
           
@@ -243,7 +243,7 @@ if (IF_CLUSTER && cluster.isPrimary) {
           });
         });
         
-        // 路由 2: 返回当前 Worker ID 和接收到的数据
+        //返回当前 Worker ID 和接收到的数据
         devServer.app.get('/api/worker/info', (req, res) => {
           console.log(chalk.cyan(`[Worker ${process.pid}] 收到 GET /api/worker/info 请求`));
           
