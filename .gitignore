@@ -8,5 +8,13 @@ build
 .env.test.local
 .env.production.local
 
+# Server 环境变量
+server/.env
+
+# PM2 相关
+logs/
+.pm2/
+ecosystem.config.js.bak
+
 # PNPM 特定
 .pnpm-store
