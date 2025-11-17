@@ -5,7 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node scripts/start-app.js",
-    "start:cluster": "node scripts/start-app.js --cluster",
+    "server:start": "node server/index.js",
+    "server:start:cluster": "cross-env ENABLE_CLUSTER=true node server/index.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:start:prod": "pm2 start ecosystem.config.js --env production",
+    "pm2:stop": "pm2 stop my-monorepo-server",
+    "pm2:restart": "pm2 restart my-monorepo-server",
+    "pm2:reload": "pm2 reload my-monorepo-server",
+    "pm2:delete": "pm2 delete my-monorepo-server",
+    "pm2:logs": "pm2 logs my-monorepo-server",
+    "pm2:monit": "pm2 monit",
+    "pm2:status": "pm2 status",
     "build": "pnpm --filter @my-monorepo/shared build && pnpm --filter @my-monorepo/app1 build && pnpm --filter @my-monorepo/app2 build",
     "build:shared": "pnpm --filter @my-monorepo/shared build",
     "build:app1": "pnpm --filter @my-monorepo/app1 build",
@@ -18,8 +28,15 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.17.1",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "dotenv": "^16.3.1"
+  },
   "devDependencies": {
     "shelljs": "^0.10.0",
-    "chalk": "^4.1.2"
+    "chalk": "^4.1.2",
+    "cross-env": "^7.0.3",
+    "pm2": "^5.3.0"
   }
 }

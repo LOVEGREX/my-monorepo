@@ -14,7 +14,9 @@ const chalk = require('chalk');
  *   pnpm start app2 build         - 运行 app2 的 build 命令
  *   pnpm start --list             - 列出所有可用的应用
  *   pnpm start --help             - 显示帮助信息
- *   pnpm start --cluster app1     - 以集群模式启动 app1
+ * 
+ * 注意: 集群模式已移除，如需使用集群模式，请使用 server 目录下的 Express 服务器
+ *       启动命令: pnpm server:start:cluster
  */
 
 const projectRoot = path.resolve(__dirname, '..');
@@ -32,7 +34,6 @@ function showHelp() {
   shell.echo('  pnpm start                    - 默认启动 app1');
   shell.echo('  pnpm start <app-name>         - 启动指定应用');
   shell.echo('  pnpm start <app-name> <cmd>   - 运行指定应用的命令');
-  shell.echo('  pnpm start --cluster <app-name> - 以集群模式启动应用');
   shell.echo('');
   shell.echo('参数:');
   shell.echo('  <app-name>  应用名称，可以是:');
@@ -42,14 +43,15 @@ function showHelp() {
   shell.echo('');
   shell.echo('选项:');
   shell.echo('  --list, -l     列出所有可用的应用');
-  shell.echo('  --cluster      以集群模式启动应用');
   shell.echo('  --help, -h     显示此帮助信息');
   shell.echo('');
   shell.echo('示例:');
   shell.echo('  pnpm start app1                 - 启动 app1 (执行 start 命令)');
   shell.echo('  pnpm start app2 test            - 运行 app2 的测试');
-  shell.echo('  pnpm start --cluster app1       - 以集群模式启动 app1');
   shell.echo('  pnpm start @my-monorepo/app3 build - 构建 app3');
+  shell.echo('');
+  shell.echo('注意: 集群模式已移除，如需使用集群模式，请使用 server 目录下的 Express 服务器');
+  shell.echo('      启动命令: pnpm server:start:cluster');
   shell.echo('');
 }
 
@@ -111,7 +113,7 @@ function validatePackage(appName) {
 }
 
 // 构建并执行命令
-function executeCommand(appName, command = 'start', extraArgs = [], useCluster = false) {
+function executeCommand(appName, command = 'start', extraArgs = []) {
   const fullPackageName = normalizePackageName(appName);
   
   // 验证包
@@ -120,22 +122,13 @@ function executeCommand(appName, command = 'start', extraArgs = [], useCluster =
   }
   
   // 构建 pnpm 命令
-  let cmdParts = [];
-  
-  // 如果启用集群模式，添加环境变量
-  if (useCluster) {
-    shell.echo(chalk.cyan('正在使用集群模式启动应用...\n'));
-    // 设置环境变量（跨平台兼容）
-    process.env.IF_CLUSTER = 'true';
-  }
-  
-  cmdParts = cmdParts.concat([
+  let cmdParts = [
     'pnpm',
     '--filter',
     fullPackageName,
     'run',
     command
-  ]);
+  ];
   
   // 添加额外参数
   if (extraArgs.length > 0) {
@@ -151,11 +144,10 @@ function executeCommand(appName, command = 'start', extraArgs = [], useCluster =
   // 执行命令，继承标准输入输出和环境变量
   const execOptions = {
     stdio: 'inherit',
-    env: { ...process.env } // 确保环境变量（包括IF_CLUSTER）被传递
+    env: { ...process.env }
   };
   
   const result = shell.exec(fullCommand, execOptions);
-
   
   // 退出并返回相同的退出码
   shell.exit(result.code);
@@ -170,21 +162,7 @@ function main() {
     return;
   }
   
-  let firstArg = args[0];
-  let useCluster = false;
-  
-  // 检查是否有 --cluster 参数
-  if (firstArg === '--cluster') {
-    useCluster = true;
-    // 将第一个参数移除，剩下的作为实际参数
-    firstArg = args[1];
-    
-    // 如果没有指定应用，默认启动 app1
-    if (!firstArg || firstArg.startsWith('-')) {
-      executeCommand('app1', 'start', [], useCluster);
-      return;
-    }
-  }
+  const firstArg = args[0];
   
   // 处理特殊选项
   if (firstArg === '--help' || firstArg === '-h') {
@@ -201,11 +179,11 @@ function main() {
   
   // 解析应用名和命令
   const appName = firstArg;
-  const command = useCluster ? 'start' : (args[1] || 'start');
-  const extraArgs = useCluster ? args.slice(2) : args.slice(2);
+  const command = args[1] || 'start';
+  const extraArgs = args.slice(2);
   
   // 执行命令
-  executeCommand(appName, command, extraArgs, useCluster);
+  executeCommand(appName, command, extraArgs);
 }
 
 // 运行主逻辑
