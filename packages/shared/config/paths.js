@@ -61,6 +61,22 @@ const appPublicPath = (() => {
   return resolveApp('../../packages/shared/public');
 })();
 
+// Resolve setupProxy.js path (shared in monorepo)
+const appProxySetupPath = (() => {
+  // First check if app has its own setupProxy.js
+  const localProxySetup = resolveModule(resolveApp, 'src/setupProxy');
+  if (fs.existsSync(localProxySetup)) {
+    return localProxySetup;
+  }
+  // Fallback to shared setupProxy.js for monorepo setup
+  const sharedProxySetup = path.resolve(__dirname, '../src/setupProxy.js');
+  if (fs.existsSync(sharedProxySetup)) {
+    return sharedProxySetup;
+  }
+  // Return null if not found
+  return null;
+})();
+
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
@@ -74,7 +90,7 @@ module.exports = {
   appJsConfig: resolveApp('jsconfig.json'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
-  proxySetup: resolveApp('src/setupProxy.js'),
+  proxySetup: appProxySetupPath,
   appNodeModules: resolveApp('node_modules'),
   appWebpackCache: resolveApp('node_modules/.cache'),
   appTsBuildInfoFile: resolveApp('node_modules/.cache/tsconfig.tsbuildinfo'),

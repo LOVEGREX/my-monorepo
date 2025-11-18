@@ -11,9 +11,7 @@ const cluster = require('cluster');
 const os = require('os');
 const express = require('express');
 const path = require('path');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 const chalk = require('chalk');
-const proxyConfig = require('./config/proxy');
 const serverConfig = require('./config/server');
 
 // 是否启用集群模式
@@ -132,35 +130,41 @@ if (ENABLE_CLUSTER && cluster.isPrimary) {
     });
   }
 
-  // 代理配置
-  if (proxyConfig && Object.keys(proxyConfig).length > 0) {
-    console.log(chalk.cyan('\n配置代理规则:'));
-    Object.keys(proxyConfig).forEach(context => {
-      const config = proxyConfig[context];
-      const target = typeof config === 'string' ? config : config.target;
-      
-      console.log(chalk.green(`  ${context} -> ${target}`));
-      
-      // 创建代理中间件
-      const proxyOptions = typeof config === 'string' 
-        ? { target: config, changeOrigin: true }
-        : { ...config, changeOrigin: config.changeOrigin !== false };
-      
-      app.use(context, createProxyMiddleware(proxyOptions));
-    });
-    console.log('');
-  }
-
-  // API路由示例
+  // ========== API 路由 ==========
+  // 这里是你的后端业务接口
+  
+  // 示例：获取服务器信息
   app.get('/api/info', (req, res) => {
     res.json({
-      message: 'Express Server with Cluster Mode',
-      workerId: process.pid,
+      message: 'Backend API Server',
+      processId: process.pid,
       clusterMode: ENABLE_CLUSTER,
       nodeVersion: process.version,
-      platform: process.platform
+      platform: process.platform,
+      timestamp: new Date().toISOString()
     });
   });
+
+  // 示例：用户相关接口
+  // app.get('/api/users', (req, res) => {
+  //   res.json({ users: [] });
+  // });
+  
+  // app.post('/api/users', (req, res) => {
+  //   // 创建用户逻辑
+  //   res.json({ success: true, user: req.body });
+  // });
+
+  // 示例：数据接口
+  // app.get('/api/data', async (req, res) => {
+  //   try {
+  //     // 从数据库获取数据
+  //     const data = await getDataFromDatabase();
+  //     res.json({ success: true, data });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // });
 
   // Worker通信API（仅在集群模式下可用）
   if (ENABLE_CLUSTER) {
@@ -233,8 +237,8 @@ if (ENABLE_CLUSTER && cluster.isPrimary) {
             workerBroadcast: 'POST /api/worker/broadcast'
           })
         },
-        staticFiles: 'Not configured. Set STATIC_PATH to serve static files.',
-        proxy: Object.keys(proxyConfig || {}).length > 0 ? 'Configured' : 'Not configured'
+        staticFiles: serverConfig.staticPath ? `Serving from: ${serverConfig.staticPath}` : 'Not configured. Set STATIC_PATH to serve static files.',
+        note: 'This is a backend API server. Frontend proxy is configured in src/setupProxy.js'
       });
     });
   }

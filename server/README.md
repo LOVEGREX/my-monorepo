@@ -1,75 +1,47 @@
-# Express Server with Cluster Mode
+# Backend API Server
 
-这是一个基于 Express 的服务器，支持集群模式和代理配置。
+这是项目的后端 API 服务器，使用 Express 框架，支持集群模式。
 
-## 功能特性
+## 📋 定位
 
-- ✅ Express 框架
-- ✅ Cluster 模式（多进程）
-- ✅ 代理配置支持
-- ✅ 静态文件服务
-- ✅ 健康检查端点
-- ✅ Worker 进程通信
-- ✅ 优雅关闭
+- ✅ **后端业务服务器**：提供数据接口和业务逻辑
+- ✅ **API 服务**：处理 `/api/*` 请求
+- ✅ **静态文件服务**（可选）：生产环境服务前端构建文件
+- ❌ **不是代理服务器**：代理配置在前端的 `src/setupProxy.js`
 
-## 快速开始
+## 🚀 快速开始
 
-### 安装依赖
+### 开发环境
 
 ```bash
-# 在项目根目录执行
-pnpm install
+# 启动后端服务器（默认端口 3001，避免与前端冲突）
+PORT=3001 pnpm server:start
+
+# 或使用 PM2
+PORT=3001 pnpm pm2:start
 ```
 
-### 启动服务器
+### 生产环境
 
 ```bash
-# 单进程模式
-pnpm server:start
-
-# 集群模式
-pnpm server:start:cluster
+# 使用 PM2（推荐）
+PORT=3001 pnpm pm2:start:prod
 ```
 
-### 环境变量
+## 📁 项目结构
 
-复制 `.env.example` 为 `.env` 并修改配置：
-
-```bash
-cp server/.env.example server/.env
+```
+server/
+├── index.js              # 服务器主文件
+├── config/
+│   └── server.js         # 服务器配置
+├── routes/               # API 路由（可扩展）
+├── controllers/          # 控制器（可扩展）
+├── models/              # 数据模型（可扩展）
+└── middleware/          # 中间件（可扩展）
 ```
 
-主要配置项：
-
-- `PORT`: 服务器端口（默认：3000）
-- `HOST`: 服务器主机（默认：0.0.0.0）
-- `ENABLE_CLUSTER`: 是否启用集群模式（true/false）
-- `NUM_WORKERS`: Worker 进程数量（默认：CPU核心数，最多4个）
-- `STATIC_PATH`: 静态文件路径（可选）
-
-## 代理配置
-
-编辑 `server/config/proxy.js` 文件来配置代理规则：
-
-```javascript
-module.exports = {
-  // 简单配置：代理所有 /api 请求
-  '/api': 'http://localhost:8080',
-  
-  // 详细配置：包含路径重写等选项
-  '/api/v2': {
-    target: 'http://localhost:8080',
-    changeOrigin: true,
-    pathRewrite: {
-      '^/api/v2': '/api'
-    }
-  }
-};
-```
-
-更多配置选项请参考 [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware) 文档。
-
-## API 端点
+## 🔌 API 接口
 
 ### 健康检查
 
@@ -77,96 +49,153 @@ module.exports = {
 GET /health
 ```
 
-返回服务器状态信息。
-
 ### 服务器信息
 
 ```
 GET /api/info
 ```
 
-返回服务器基本信息。
+### 自定义 API
 
-### Worker 信息（仅集群模式）
+在 `server/index.js` 中添加你的业务接口：
 
-```
-GET /api/worker/info
-```
+```javascript
+// 用户接口
+app.get('/api/users', (req, res) => {
+  res.json({ users: [] });
+});
 
-返回当前 Worker 的信息和接收到的消息。
-
-### 广播消息（仅集群模式）
-
-```
-POST /api/worker/broadcast
-Content-Type: application/json
-
-{
-  "message": "Hello from worker"
-}
+app.post('/api/users', (req, res) => {
+  // 创建用户
+  res.json({ success: true });
+});
 ```
 
-向其他 Worker 进程广播消息。
+## 🔗 与前端集成
 
-## 集群模式
+### 前端代理配置
 
-集群模式使用 Node.js 的 `cluster` 模块，可以：
+前端使用 `src/setupProxy.js` 配置代理：
 
-- 充分利用多核 CPU
-- 提高服务器性能和稳定性
-- 自动重启崩溃的 Worker 进程
-- 支持 Worker 进程间通信
+```javascript
+// apps/app1/src/setupProxy.js
+app.use('/api', createProxyMiddleware({
+  target: 'http://localhost:3001', // 后端服务器地址
+  changeOrigin: true,
+}));
+```
+
+### 开发环境工作流程
+
+```
+前端 (WebpackDevServer:3000)
+    ↓ /api/* 请求
+setupProxy.js 代理
+    ↓
+后端服务器 (Express:3001)
+    ↓
+返回数据
+```
+
+## ⚙️ 配置
+
+### 环境变量
+
+编辑 `server/.env`：
+
+```env
+PORT=3001
+HOST=0.0.0.0
+ENABLE_CLUSTER=false
+NODE_ENV=development
+STATIC_PATH=./apps/app1/build  # 可选：静态文件路径
+```
+
+### 服务器配置
+
+编辑 `server/config/server.js`：
+
+```javascript
+module.exports = {
+  staticPath: process.env.STATIC_PATH || null,
+  // 其他配置...
+};
+```
+
+## 🔄 集群模式
 
 ### 启用集群模式
 
 ```bash
-# 方式1：使用环境变量
+# 方式1：环境变量
 ENABLE_CLUSTER=true pnpm server:start
 
-# 方式2：使用脚本
-pnpm server:start:cluster
+# 方式2：PM2（推荐）
+pnpm pm2:start
 ```
 
-### Worker 进程数量
+### PM2 配置
 
-默认情况下，Worker 数量为 CPU 核心数，最多 4 个。可以通过环境变量调整：
+PM2 会自动管理多个进程，无需在代码中启用 cluster。
+
+## 📝 扩展开发
+
+### 添加路由
+
+创建 `server/routes/api.js`：
+
+```javascript
+const express = require('express');
+const router = express.Router();
+
+router.get('/users', (req, res) => {
+  res.json({ users: [] });
+});
+
+module.exports = router;
+```
+
+在 `server/index.js` 中使用：
+
+```javascript
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
+```
+
+### 添加中间件
+
+```javascript
+// 自定义中间件
+app.use((req, res, next) => {
+  // 你的逻辑
+  next();
+});
+```
+
+## 🐛 调试
+
+### 查看日志
 
 ```bash
-NUM_WORKERS=8 pnpm server:start:cluster
+# PM2 日志
+pnpm pm2:logs
+
+# 或直接运行
+pnpm server:start
 ```
 
-## 静态文件服务
-
-如果需要服务前端构建后的文件，设置 `STATIC_PATH` 环境变量：
+### 测试 API
 
 ```bash
-STATIC_PATH=./apps/app1/build pnpm server:start
+# 健康检查
+curl http://localhost:3001/health
+
+# API 测试
+curl http://localhost:3001/api/info
 ```
 
-或者在 `.env` 文件中配置：
+## 📚 相关文档
 
-```
-STATIC_PATH=./apps/app1/build
-```
-
-## 开发建议
-
-1. **开发环境**：使用单进程模式，便于调试
-2. **生产环境**：使用集群模式，提高性能
-3. **代理配置**：根据实际后端服务地址配置代理
-4. **静态文件**：生产环境建议使用 Nginx 等服务静态文件
-
-## 故障排除
-
-### 端口被占用
-
-修改 `PORT` 环境变量或 `.env` 文件中的端口号。
-
-### 代理不工作
-
-检查 `server/config/proxy.js` 中的配置是否正确，确保目标服务器可访问。
-
-### Worker 进程频繁重启
-
-检查应用代码是否有未捕获的错误，查看日志定位问题。
-
+- [SERVER_USAGE.md](../SERVER_USAGE.md) - 详细使用说明
+- [PM2_USAGE.md](../PM2_USAGE.md) - PM2 使用指南
+- [CLUSTER_IMPLEMENTATION.md](../CLUSTER_IMPLEMENTATION.md) - 集群模式实现
